@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Post } from '@/types/blog.type'
-import { addPost, cancelEditingPost, finishEditingPost } from '../blog.slice'
-import { RootState } from '@/store'
+import { addPost, cancelEditingPost, updatePost } from '../blog.slice'
+import { RootState, useAppDispatch } from '@/store'
 
 const initialState: Post = {
   id: '',
@@ -15,24 +15,23 @@ const initialState: Post = {
 
 const CreatePost = () => {
   const [formData, setFormData] = useState<Post>(initialState)
-  const dispatch = useDispatch()
-  const editingPost = useSelector((state: RootState) => state.blog.editingPost)
+  const dispatch = useAppDispatch()
+  const { editingPost } = useSelector((state: RootState) => state.blog)
 
   useEffect(() => {
     setFormData(editingPost || initialState)
-    if (editingPost) {
-      window.scroll({
-        top: 0,
-        behavior: 'smooth',
-      })
-    }
+
+    window.scroll({
+      top: 0,
+      behavior: 'smooth',
+    })
   }, [editingPost])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (editingPost) {
-      dispatch(finishEditingPost(formData))
+      dispatch(updatePost({ postId: editingPost.id, body: formData }))
       handleCancel()
     } else {
       dispatch(addPost(formData))
@@ -74,7 +73,7 @@ const CreatePost = () => {
           type="text"
           id="featuredImage"
           className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-          placeholder="Url image"
+          placeholder="URL image"
           required
           value={formData.featuredImage}
           onChange={(event) =>

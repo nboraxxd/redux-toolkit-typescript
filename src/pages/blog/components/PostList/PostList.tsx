@@ -1,15 +1,23 @@
-import { RootState } from '@/store'
-import { useSelector, useDispatch } from 'react-redux'
+import { RootState, useAppDispatch } from '@/store'
+import { useSelector } from 'react-redux'
 import { PostItem } from '../PostItem'
-import { deletePost, startEditingPost } from '../blog.slice'
+import { deletePost, getPostList, startEditingPost } from '../blog.slice'
 import { ConfirmPost } from '../ConfirmPost'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { SkeletonPost } from '../SkeletonPost'
 
 const PostList = () => {
   const [postIdToDel, setPostIdToDel] = useState<string | null>(null)
-  const postList = useSelector((state: RootState) => state.blog.postList)
-  const dispatch = useDispatch()
+  const { postList, loading } = useSelector((state: RootState) => state.blog)
+  const dispatch = useAppDispatch()
   const visibleConfirm = postIdToDel !== null
+
+  useEffect(() => {
+    const promise = dispatch(getPostList())
+    return () => {
+      promise.abort()
+    }
+  }, [dispatch])
 
   const handleDeletePost = () => {
     if (postIdToDel) {
@@ -43,14 +51,21 @@ const PostList = () => {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-2 xl:gap-8">
-          {postList.map((postItem) => (
-            <PostItem
-              key={postItem.id}
-              postItem={postItem}
-              handleShowConfirmDelPost={handleShowConfirmDelPost}
-              handleStartEditingPost={handleStartEditingPost}
-            />
-          ))}
+          {loading && (
+            <>
+              <SkeletonPost />
+              <SkeletonPost />
+            </>
+          )}
+          {!loading &&
+            postList.map((postItem) => (
+              <PostItem
+                key={postItem.id}
+                postItem={postItem}
+                handleShowConfirmDelPost={handleShowConfirmDelPost}
+                handleStartEditingPost={handleStartEditingPost}
+              />
+            ))}
         </div>
       </div>
       <ConfirmPost
