@@ -1,7 +1,7 @@
 import { RootState } from '@/store'
 import { useSelector, useDispatch } from 'react-redux'
 import { PostItem } from '../PostItem'
-import { deletePost, startEditingPost } from '../blog.reducer'
+import { deletePost, startEditingPost } from '../blog.slice'
 import { ConfirmPost } from '../ConfirmPost'
 import { useState } from 'react'
 
