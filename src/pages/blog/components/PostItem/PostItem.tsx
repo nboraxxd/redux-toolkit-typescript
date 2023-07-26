@@ -38,9 +38,9 @@ const PostItem = ({ postItem, handleShowConfirmDelPost, handleStartEditingPost }
             <button
               type="button"
               className={classNames(
-                'rounded-r-lg border-t border-b border-r border-gray-200 bg-white py-2 px-4 text-sm font-medium text-gray-900',
+                'rounded-r-lg border-t border-b border-r border-gray-200 bg-white py-2 px-4 text-sm font-medium',
                 {
-                  'hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700':
+                  'text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700':
                     !(editingPostId === postItem.id),
                   'text-gray-300': editingPostId === postItem.id,
                 }

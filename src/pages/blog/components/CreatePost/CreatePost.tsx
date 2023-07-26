@@ -3,6 +3,11 @@ import { useSelector } from 'react-redux'
 import { Post } from '@/types/blog.type'
 import { addPost, cancelEditingPost, updatePost } from '../blog.slice'
 import { RootState, useAppDispatch } from '@/store'
+import classNames from 'classnames'
+
+interface ErrorForm {
+  publishDate: string
+}
 
 const initialState: Post = {
   id: '',
@@ -15,6 +20,7 @@ const initialState: Post = {
 
 const CreatePost = () => {
   const [formData, setFormData] = useState<Post>(initialState)
+  const [errorForm, setErrorForm] = useState<ErrorForm | null>(null)
   const dispatch = useAppDispatch()
   const { editingPost } = useSelector((state: RootState) => state.blog)
 
@@ -27,20 +33,33 @@ const CreatePost = () => {
     })
   }, [editingPost])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (editingPost) {
       dispatch(updatePost({ postId: editingPost.id, body: formData }))
-      handleCancel()
+        .unwrap()
+        .then((res) => {
+          console.log(res)
+          handleCancel()
+        })
+        .catch((error) => {
+          setErrorForm(error.error)
+        })
     } else {
-      dispatch(addPost(formData))
-      setFormData(initialState)
+      try {
+        await dispatch(addPost(formData)).unwrap()
+        setFormData(initialState)
+        setErrorForm(null)
+      } catch (error: any) {
+        setErrorForm(error.error)
+      }
     }
   }
 
   const handleCancel = () => {
     dispatch(cancelEditingPost())
+    setErrorForm(null)
   }
 
   return (
@@ -105,14 +124,22 @@ const CreatePost = () => {
       <div className="mb-6">
         <label
           htmlFor="publishDate"
-          className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300"
+          className={classNames('mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300', {
+            'text-gray-900': !errorForm?.publishDate,
+            'text-red-600': errorForm?.publishDate,
+          })}
         >
           Publish Date
         </label>
         <input
           type="datetime-local"
           id="publishDate"
-          className="block w-56 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+          className={classNames('block w-56 p-2.5 border rounded-lg text-sm focus:outline-none', {
+            'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500':
+              !errorForm?.publishDate,
+            'border-red-300 bg-red-50 text-red-600 focus:border-red-500 focus:ring-red-500':
+              errorForm?.publishDate,
+          })}
           placeholder="Title"
           required
           value={formData.publishDate}
@@ -120,6 +147,9 @@ const CreatePost = () => {
             setFormData((prev) => ({ ...prev, publishDate: event.target.value }))
           }
         />
+        {errorForm?.publishDate && (
+          <p className="mt-2 text-red-600 text-xs">{errorForm?.publishDate}</p>
+        )}
       </div>
       <div className="mb-6 flex items-center">
         <input
