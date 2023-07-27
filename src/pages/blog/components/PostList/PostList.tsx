@@ -1,43 +1,6 @@
-import { RootState, useAppDispatch } from '@/store'
-import { useSelector } from 'react-redux'
 import { PostItem } from '../PostItem'
-import { deletePost, getPostList, startEditingPost } from '../blog.slice'
-import { ConfirmPost } from '../ConfirmPost'
-import { useEffect, useState } from 'react'
-import { SkeletonPost } from '../SkeletonPost'
 
 const PostList = () => {
-  const [postIdToDel, setPostIdToDel] = useState<string | null>(null)
-  const { postList, loading } = useSelector((state: RootState) => state.blog)
-  const dispatch = useAppDispatch()
-  const visibleConfirm = postIdToDel !== null
-
-  useEffect(() => {
-    const promise = dispatch(getPostList())
-    return () => {
-      promise.abort()
-    }
-  }, [dispatch])
-
-  const handleDeletePost = () => {
-    if (postIdToDel) {
-      dispatch(deletePost(postIdToDel))
-      setPostIdToDel(null)
-    }
-  }
-
-  const handleShowConfirmDelPost = (id: string) => {
-    setPostIdToDel(id)
-  }
-
-  const handleHideConfirm = () => {
-    setPostIdToDel(null)
-  }
-
-  const handleStartEditingPost = (postId: string) => {
-    dispatch(startEditingPost(postId))
-  }
-
   return (
     <div className="bg-white py-6 sm:py-8 lg:py-12">
       <div className="mx-auto max-w-screen-xl px-4 md:px-8">
@@ -51,28 +14,12 @@ const PostList = () => {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-2 xl:gap-8">
-          {loading && (
-            <>
-              <SkeletonPost />
-              <SkeletonPost />
-            </>
-          )}
-          {!loading &&
-            postList.map((postItem) => (
-              <PostItem
-                key={postItem.id}
-                postItem={postItem}
-                handleShowConfirmDelPost={handleShowConfirmDelPost}
-                handleStartEditingPost={handleStartEditingPost}
-              />
-            ))}
+          <PostItem />
+          <PostItem />
+          <PostItem />
+          <PostItem />
         </div>
       </div>
-      <ConfirmPost
-        visibleConfirm={visibleConfirm}
-        confirm={handleDeletePost}
-        cancel={handleHideConfirm}
-      />
     </div>
   )
 }
