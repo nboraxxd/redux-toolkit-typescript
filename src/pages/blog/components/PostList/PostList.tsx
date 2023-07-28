@@ -1,6 +1,7 @@
-import { useGetPostsQuery } from '../../blog.service'
+import { useGetPostsQuery } from '@/pages/blog/blog.service'
 import { PostItem } from '../PostItem'
 import { SkeletonPost } from '../SkeletonPost'
+import { Post } from '@/types/blog.type'
 
 const PostList = () => {
   // isLoading chỉ dành cho lần fetch đầu tiên
@@ -26,7 +27,7 @@ const PostList = () => {
               <SkeletonPost />
             </>
           )}
-          {!isFetching && data?.map((post) => <PostItem key={post.id} post={post} />)}
+          {!isFetching && data?.map((post: Post) => <PostItem key={post.id} post={post} />)}
         </div>
       </div>
     </div>

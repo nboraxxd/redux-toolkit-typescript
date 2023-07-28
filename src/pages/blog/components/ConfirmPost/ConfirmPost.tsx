@@ -9,7 +9,6 @@ interface ConfirmPostType {
 const ConfirmPost = ({ visibleConfirm, confirm, cancel }: ConfirmPostType) => {
   return createPortal(
     <div className={classNames('fixed z-[1200] inset-0', { invisible: !visibleConfirm })}>
-      {/* "fixed invisible z-[1200] inset-0" */}
       <div className="fixed flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-[-1] opacity-100 transition-opacity duration-[225ms] ease-in-out delay-[0ms] inset-0"></div>
       <div className="h-full flex justify-center items-center opacity-100 outline-0 transition-opacity duration-[225ms] ease-in-out delay-[0ms]">
         <div className="p-8 rounded-[5px] bg-white">
