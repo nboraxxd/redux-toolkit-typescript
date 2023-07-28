@@ -1,7 +1,7 @@
 import { useGetPostsQuery } from '@/pages/blog/blog.service'
+import { Post } from '@/types/blog.type'
 import { PostItem } from '../PostItem'
 import { SkeletonPost } from '../SkeletonPost'
-import { Post } from '@/types/blog.type'
 
 const PostList = () => {
   // isLoading chỉ dành cho lần fetch đầu tiên

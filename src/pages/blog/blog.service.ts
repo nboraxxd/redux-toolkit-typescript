@@ -1,4 +1,5 @@
 import { Post } from '@/types/blog.type'
+import { CustomError } from '@/utils/helpers'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const blogApi = createApi({
@@ -45,17 +46,24 @@ export const blogApi = createApi({
      */
     addPost: build.mutation<Post, Omit<Post, 'id'>>({
       query(body) {
-        return {
-          url: '/posts',
-          method: 'POST',
-          body,
+        try {
+          // throw Error('hmm')
+          // const a: any = null
+          // a.b = 1
+          return {
+            url: '/posts',
+            method: 'POST',
+            body,
+          }
+        } catch (error: any) {
+          throw new CustomError(error.message)
         }
       },
       /**
        * invalidatesTags cung cấp các tag để báo hiệu cho những method nào có providesTags match với nó sẽ bị gọi lại.
        * Trong những trường hợp này getPosts match nên sẽ gọi lại.
        */
-      invalidatesTags: () => [{ type: 'Posts', id: 'LIST' }],
+      invalidatesTags: (_result, error) => (error ? [] : [{ type: 'Posts', id: 'LIST' }]),
     }),
     updatePost: build.mutation<Post, { id: string; body: Post }>({
       query(data) {
@@ -66,7 +74,7 @@ export const blogApi = createApi({
         }
       },
       // Trong trường hợp này thì getPosts sẽ được gọi lại
-      invalidatesTags: (_result, _error, data) => [{ type: 'Posts', id: data.id }],
+      invalidatesTags: (_result, error, data) => (error ? [] : [{ type: 'Posts', id: data.id }]),
     }),
     deletePost: build.mutation<object, string>({
       query(id) {

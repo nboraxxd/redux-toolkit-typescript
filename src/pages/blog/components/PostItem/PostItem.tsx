@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Post } from '@/types/blog.type'
 import { startEditPost } from '@/pages/blog/blog.slice'
 import { ConfirmPost } from '../ConfirmPost'
 import { useDeletePostMutation } from '@/pages/blog/blog.service'
+import { RootState } from '@/store'
+import classNames from 'classnames'
 
 interface PostItemProps {
   post: Post
@@ -12,6 +14,7 @@ interface PostItemProps {
 const PostItem = ({ post }: PostItemProps) => {
   const [delPostId, setDelPostId] = useState<string>('')
   const visibleConfirm = Boolean(delPostId)
+  const { postId: editingPostId } = useSelector((state: RootState) => state.blog)
 
   const dispatch = useDispatch()
   const [deletePost] = useDeletePostMutation()
@@ -49,7 +52,15 @@ const PostItem = ({ post }: PostItemProps) => {
             </button>
             <button
               type="button"
-              className="rounded-r-lg border-t border-b border-r border-gray-200 bg-white py-2 px-4 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700"
+              className={classNames(
+                'rounded-r-lg border-t border-b border-r border-gray-200 bg-white py-2 px-4 text-sm font-medium',
+                {
+                  'text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700':
+                    !(editingPostId === post.id),
+                  'text-gray-300 cursor-not-allowed': editingPostId === post.id,
+                }
+              )}
+              disabled={editingPostId === post.id}
               onClick={() => setDelPostId(post.id)}
             >
               Delete
