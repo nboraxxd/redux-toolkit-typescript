@@ -31,7 +31,10 @@ const CreatePost = () => {
   const [addPost, addPostResult] = useAddPostMutation()
   const [updatePost, updatePostResult] = useUpdatePostMutation()
   const { postId } = useSelector((state: RootState) => state.blog)
-  const { data: dataToUpdate } = useGetPostQuery(postId, { skip: !postId })
+  const { data: dataToUpdate, refetch } = useGetPostQuery(postId, {
+    skip: !postId,
+    refetchOnMountOrArgChange: 5,
+  })
   const dispatch = useDispatch()
 
   /**
@@ -62,8 +65,12 @@ const CreatePost = () => {
     ev.preventDefault()
 
     try {
-      if (dataToUpdate && postId) await updatePost({ body: formData as Post, id: postId }).unwrap()
-      else await addPost(formData).unwrap()
+      if (dataToUpdate && postId) {
+        await updatePost({ body: formData as Post, id: postId }).unwrap()
+        dispatch(cancelEditPost())
+      } else {
+        await addPost(formData).unwrap()
+      }
 
       setFormData(initialState)
     } catch (error) {
@@ -78,6 +85,24 @@ const CreatePost = () => {
 
   return (
     <form onSubmit={handleSubmit} onReset={cancelEdit}>
+      <button
+        type="button"
+        className="group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-lime-200 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 dark:focus:ring-lime-800"
+        onClick={() => refetch()}
+      >
+        <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+          Force fetch
+        </span>
+      </button>
+      <button
+        type="button"
+        className="group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-red-100 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 dark:focus:ring-red-400"
+      >
+        <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+          Cancel
+        </span>
+      </button>
+
       <div className="mb-6">
         <label
           htmlFor="title"

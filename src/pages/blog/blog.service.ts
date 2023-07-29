@@ -5,7 +5,15 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const blogApi = createApi({
   reducerPath: 'blogApi', // tên field trong Redux state
   tagTypes: ['Posts'], // những kiểu tag cho phép dùng trong blogAPI
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3004' }),
+  keepUnusedDataFor: 50,
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:3004',
+    prepareHeaders(headers) {
+      headers.set('authorization', 'Bearer ABCXYZ')
+
+      return headers
+    },
+  }),
   endpoints: (build) => ({
     // Generic type theo thứ tự là kiểu response trả về và argument
     getPosts: build.query<Post[], void>({
@@ -37,7 +45,16 @@ export const blogApi = createApi({
       },
     }),
     getPost: build.query<Post, string>({
-      query: (id) => `/posts/${id}`,
+      query: (id) => ({
+        url: `/posts/${id}`,
+        headers: {
+          hello: "I'm Duoc",
+        },
+        params: {
+          first_name: 'du',
+          last_name: 'duoc',
+        },
+      }),
     }),
 
     /**
